@@ -247,6 +247,7 @@ public class BitWorld {
 		body.parents.clear();
 
 		body.resolutionLocked = false;
+		body.lastResolution.set(0,0);
 	}
 
 	private void doAddRemoves() {
@@ -277,7 +278,7 @@ public class BitWorld {
 				pendingResolutions.get(body).resolve(this);
 				applyResolution(body, pendingResolutions.get(body));
 			} else {
-				body.lastResolution.set(0,0);
+				//body.lastResolution.set(0,0);
 			}
 		});
 		pendingResolutions.clear();
@@ -404,7 +405,7 @@ public class BitWorld {
 				body.grounded = true;
 			}
 		}
-		body.lastResolution = resolution.resolution;
+		body.lastResolution.add(resolution.resolution);
 		body.resolutionLocked = resolution.lockingResolution;
 	}
 
