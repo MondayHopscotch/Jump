@@ -93,6 +93,11 @@ public class BitBody {
 	 */
 	public BitPoint lastResolution = new BitPoint(0, 0);
 
+    /**
+     * Flag that tells the engine not to let this body more any more during the current world step
+     */
+    public boolean resolutionLocked;
+
 	/**
 	 * Only active bodies are updated in the world
 	 */

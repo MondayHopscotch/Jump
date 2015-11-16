@@ -28,6 +28,7 @@ public class ShellLevelObject extends RenderableLevelObject {
         body.aabb = new BitRectangle(rect);
         body.bodyType = BodyType.DYNAMIC;
         body.props.gravitational = true;
+        body.props.crushable = false;
         return body;
     }
 

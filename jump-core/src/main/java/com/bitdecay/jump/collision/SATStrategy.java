@@ -34,10 +34,14 @@ public class SATStrategy extends BitResolution {
                 if (satRes.axis.equals(GeomUtils.ZERO_AXIS)) {
                     continue;
                 }
+                // Special handling for collision body types
+                if (BodyType.STATIC.equals(collision.otherBody.bodyType) || BodyType.KINETIC.equals(collision.otherBody.bodyType)) {
+                    this.lockingResolution = true;
+                }
                 BitPoint resAxis = satRes.result.normalize();
                 for (BitPoint otherAxis : directionsResolved) {
                     // this will only check exact opposites, may need to change if we move away from rectangle tiles
-                    if (resAxis.scale(-1).equals(otherAxis)) {
+                    if (body.props.crushable && resAxis.scale(-1).equals(otherAxis)) {
                         // reset any pending resolutions.
                         // don't bother moving a dead body
                         // short circuit the resolution

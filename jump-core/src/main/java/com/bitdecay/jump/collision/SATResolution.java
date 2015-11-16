@@ -53,7 +53,9 @@ public class SATResolution {
         axes.sort((o1, o2) -> Float.compare(Math.abs(o1.distance), Math.abs(o2.distance)));
         // this line is just taking where the body tried to move and the partially resolved position into account to
         // figure out the relative momentum.
-        BitPoint relativeMovement = body.currentAttempt.plus(resolvedPosition.xy.minus(body.aabb.xy)).minus(otherBody.currentAttempt);
+        BitPoint bodyAttempt = body.resolutionLocked ? new BitPoint(0, 0) : body.currentAttempt;
+        BitPoint otherBodyAttempt = otherBody.resolutionLocked ? new BitPoint(0, 0) : otherBody.currentAttempt;
+        BitPoint relativeMovement = bodyAttempt.plus(resolvedPosition.xy.minus(body.aabb.xy)).minus(otherBodyAttempt);
         float dotProd;
         for (AxisOverlap axisOver : axes) {
             dotProd = relativeMovement.dot(axisOver.axis);

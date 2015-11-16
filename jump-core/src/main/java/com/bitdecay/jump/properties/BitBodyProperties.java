@@ -12,6 +12,11 @@ public class BitBodyProperties {
     public boolean collides = true;
 
     /**
+     * Flag dictating if conflicting resolutions will deactivate the body
+     */
+    public boolean crushable = true;
+
+    /**
      * The acceleration of the body while on the ground
      */
     @ValueRange(min = 0, max = 5000)

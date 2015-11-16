@@ -171,21 +171,27 @@ public class BitWorld {
 		 * END OF MOVING EVERYTHING
 		 */
 
-		/**
-		 * BUILD COLLISIONS
-		 */
-		dynamicBodies.stream().forEach(body -> {
-			if (body.active) {
-				buildLevelCollisions(body);
-				updateExistingContact(body);
-				findNewContact(body);
-			}
-		});
-		/**
-		 * END COLLISIONS
-		 */
+		boolean continueCollisions = true;
+		while (continueCollisions) {
+			/**
+			 * BUILD COLLISIONS
+			 */
+			dynamicBodies.stream().forEach(body -> {
+				if (body.active) {
+					buildLevelCollisions(body);
+					updateExistingContact(body);
+					if (!body.resolutionLocked) {
+						findNewCollisions(body);
+					}
+				}
+			});
+			/**
+			 * END COLLISIONS
+			 */
 
-		resolveAndApplyPendingResolutions();
+			continueCollisions = pendingResolutions.size() > 0;
+			resolveAndApplyPendingResolutions();
+		}
 
 		dynamicBodies.parallelStream().forEach(body -> {
 			if (body.active && body.renderStateWatcher != null) {
@@ -239,6 +245,8 @@ public class BitWorld {
 		body.grounded = false;
 		// all dynamicBodies assumed to be independent unless a lineage collision happens this step.
 		body.parents.clear();
+
+		body.resolutionLocked = false;
 	}
 
 	private void doAddRemoves() {
@@ -299,7 +307,7 @@ public class BitWorld {
 		}
 	}
 
-	private void findNewContact(BitBody body) {
+	private void findNewCollisions(BitBody body) {
 		// We need to update each body against the level grid so we only collide things worth colliding
 		BitPoint startCell = body.aabb.xy.floorDivideBy(tileSize, tileSize).minus(gridOffset);
 
@@ -316,10 +324,10 @@ public class BitWorld {
 				}
 				for (BitBody otherBody : occupiedSpaces.get(x).get(y)) {
 					if (otherBody != body) {
-						if (BodyType.DYNAMIC.equals(body.bodyType) ^ BodyType.DYNAMIC.equals(otherBody.bodyType.DYNAMIC)) {
+//						if (BodyType.DYNAMIC.equals(body.bodyType) ^ BodyType.DYNAMIC.equals(otherBody.bodyType.DYNAMIC)) {
 							// kinetic platforms currently also flag contacts with dynamic bodies
 							checkForNewCollision(body, otherBody);
-						}
+//						}
 
 						checkContact(body, otherBody);
 					}
@@ -397,6 +405,7 @@ public class BitWorld {
 			}
 		}
 		body.lastResolution = resolution.resolution;
+		body.resolutionLocked = resolution.lockingResolution;
 	}
 
 	/**

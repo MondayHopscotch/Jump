@@ -25,6 +25,11 @@ public abstract class BitResolution {
 	protected BitPoint resolution = new BitPoint(0, 0);
 	protected BitBody body;
 
+	/**
+	 * If true, this body should not undergo any further resolutions after this one is applied
+	 */
+	public boolean lockingResolution;
+
 	public BitResolution(BitBody body) {
 		this.body = body;
 		resolvedPosition = new BitRectangle(body.aabb);

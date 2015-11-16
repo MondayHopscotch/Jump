@@ -170,6 +170,11 @@ public class ExampleEditorLevel implements EditorHook {
             });
 
             world.addBody(playerBody);
+
+            BitBody testBody = new BitBody();
+            testBody.bodyType = BodyType.DYNAMIC;
+            testBody.aabb = new BitRectangle(level.debugSpawn.rect.xy.x + 100,level.debugSpawn.rect.xy.y,16,32);
+            world.addBody(testBody);
         }
     }
 
