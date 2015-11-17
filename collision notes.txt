@@ -1,0 +1,5 @@
+Collisions need to be sorted so that dynamic vs static/kinetic collisions are resolved LAST.
+
+Last means that the body will for sure not be inside of any static or kinetic bodies at the end of a collision resolution cycle.
+Need to also mark dynamic bodies that are resolved against locked dynamic bodies as locked themselves (propagate this locked status)
+Store and set a cumulative resolution for each body (can probably just add each loop's resolution to the body's total resolution)

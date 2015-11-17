@@ -171,18 +171,20 @@ public class BitWorld {
 		 * END OF MOVING EVERYTHING
 		 */
 
+		int remainingIterations = 10;
 		boolean continueCollisions = true;
 		while (continueCollisions) {
+			if (remainingIterations-- <= 0 ) {
+				break;
+			}
 			/**
 			 * BUILD COLLISIONS
 			 */
 			dynamicBodies.stream().forEach(body -> {
-				if (body.active) {
+				if (body.active && !body.resolutionLocked) {
+					findNewCollisions(body);
 					buildLevelCollisions(body);
 					updateExistingContact(body);
-					if (!body.resolutionLocked) {
-						findNewCollisions(body);
-					}
 				}
 			});
 			/**
