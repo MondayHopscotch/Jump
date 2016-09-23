@@ -83,6 +83,7 @@ public class LevelEditor extends InputAdapter implements Screen, OptionsUICallba
     public LevelLayersBuilder curLevelBuilder;
     public String currentFile = "";
 
+    private boolean renderAsGame = false;
     private OrthographicCamera camera;
     private LibGDXWorldRenderer worldRenderer;
     private LibGDXLevelRenderer levelRenderer;
@@ -172,10 +173,17 @@ public class LevelEditor extends InputAdapter implements Screen, OptionsUICallba
         }
 
         handleInput();
-
         camera.update();
-        spriteBatch.setProjectionMatrix(camera.combined);
-        shaper.setProjectionMatrix(camera.combined);
+
+        OrthographicCamera renderingCamera;
+        if (renderAsGame) {
+            renderingCamera = hooker.getCamera();
+        } else {
+            renderingCamera = camera;
+        }
+
+        spriteBatch.setProjectionMatrix(renderingCamera.combined);
+        shaper.setProjectionMatrix(renderingCamera.combined);
 
         if (singleStep) {
             singleStep = false;
@@ -186,17 +194,17 @@ public class LevelEditor extends InputAdapter implements Screen, OptionsUICallba
             hooker.update(0);
         }
         if (RenderLayer.GAME.enabled) {
-            hooker.render(camera);
+            hooker.render(renderingCamera);
         }
         if (RenderLayer.GRID.enabled) {
-            drawGrid();
+            drawGrid(renderingCamera);
         }
         if (RenderLayer.LEVEL_OBJECTS.enabled) {
-            levelRenderer.render(curLevelBuilder, camera);
+            levelRenderer.render(curLevelBuilder, renderingCamera);
         }
-        worldRenderer.render(hooker.getWorld(), camera);
+        worldRenderer.render(hooker.getWorld(), renderingCamera);
         debugRender();
-        drawOrigin();
+        drawOrigin(renderingCamera);
 
         spriteBatch.begin();
         shaper.begin(ShapeType.Line);
@@ -206,7 +214,7 @@ public class LevelEditor extends InputAdapter implements Screen, OptionsUICallba
 
         uiBatch.begin();
         renderExtraUIHints();
-        renderStrings();
+        renderStrings(renderingCamera);
         renderVersion();
         renderSpecial();
         uiBatch.end();
@@ -258,7 +266,7 @@ public class LevelEditor extends InputAdapter implements Screen, OptionsUICallba
 
     }
 
-    private void renderStrings() {
+    private void renderStrings(OrthographicCamera camera) {
         for (RenderLayer layer : extraStrings.keySet()) {
             if (layer.enabled) {
                 for (Map.Entry<BitPoint, String> entry : extraStrings.get(layer).entrySet()) {
@@ -308,7 +316,7 @@ public class LevelEditor extends InputAdapter implements Screen, OptionsUICallba
         extraStrings.get(type).put(location, text);
     }
 
-    private void drawGrid() {
+    private void drawGrid(OrthographicCamera camera) {
         if (camera.zoom >= ZOOM_THRESHOLD) {
             return;
         }
@@ -328,7 +336,7 @@ public class LevelEditor extends InputAdapter implements Screen, OptionsUICallba
         shaper.end();
     }
 
-    private void drawOrigin() {
+    private void drawOrigin(OrthographicCamera camera) {
         shaper.setColor(BitColors.ORIGIN);
         shaper.begin(ShapeType.Filled);
         shaper.circle(0, 0, camera.zoom * (curLevelBuilder.getCellSize() / 3));
@@ -341,6 +349,10 @@ public class LevelEditor extends InputAdapter implements Screen, OptionsUICallba
     }
 
     private void handleInput() {
+        if (EditorKeys.TOGGLE_GAME.isJustPressed()) {
+            renderAsGame = !renderAsGame;
+        }
+
         if (EditorKeys.PAUSE.isJustPressed()) {
             stepWorld = !stepWorld;
         }
@@ -353,6 +365,11 @@ public class LevelEditor extends InputAdapter implements Screen, OptionsUICallba
             if (editorUpdates % 4 == 0) {
                 singleStep = true;
             }
+        }
+
+        if (renderAsGame) {
+            // don't handle the rest of the input
+            return;
         }
 
         if (EditorKeys.PAN_LEFT.isPressed()) {
@@ -402,24 +419,36 @@ public class LevelEditor extends InputAdapter implements Screen, OptionsUICallba
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        if (renderAsGame) {
+            return false;
+        }
         mouseMode.mouseDown(getMouseCoords(), MouseButton.getButton(button));
         return super.touchDown(screenX, screenY, pointer, button);
     }
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        if (renderAsGame) {
+            return false;
+        }
         mouseMode.mouseUp(getMouseCoords(), MouseButton.getButton(button));
         return super.touchUp(screenX, screenY, pointer, button);
     }
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
+        if (renderAsGame) {
+            return false;
+        }
         mouseMode.mouseDragged(getMouseCoords());
         return super.mouseMoved(screenX, screenY);
     }
 
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
+        if (renderAsGame) {
+            return false;
+        }
         mouseMode.mouseMoved(getMouseCoords());
         return super.mouseMoved(screenX, screenY);
     }

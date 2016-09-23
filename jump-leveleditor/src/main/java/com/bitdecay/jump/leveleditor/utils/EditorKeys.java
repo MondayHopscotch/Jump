@@ -16,6 +16,7 @@ public enum EditorKeys {
     ROLL_WORLD("Roll World", false, Input.Keys.MINUS),
 
     // Camera controls
+    TOGGLE_GAME("Toggle Game Camera", false, Input.Keys.BACKSLASH),
     PAN_LEFT("Camera Left", false, Input.Keys.LEFT),
     PAN_RIGHT("Camera Right", false, Input.Keys.RIGHT),
     PAN_UP("Camera Up", false, Input.Keys.UP),

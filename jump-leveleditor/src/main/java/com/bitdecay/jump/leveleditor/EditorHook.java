@@ -14,6 +14,7 @@ import java.util.List;
 public interface EditorHook extends LevelBuilderListener {
     void update(float delta);
     void render(OrthographicCamera cam);
+    OrthographicCamera getCamera();
     BitWorld getWorld();
     List<EditorIdentifierObject> getTilesets();
     List<EditorIdentifierObject> getThemes();

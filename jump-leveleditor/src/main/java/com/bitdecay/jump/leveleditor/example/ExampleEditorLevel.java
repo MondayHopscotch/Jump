@@ -50,6 +50,8 @@ public class ExampleEditorLevel implements EditorHook {
 
     Map<Integer, TextureRegion[]> tilesetMap = new HashMap<>();
 
+    OrthographicCamera gameCamera = new OrthographicCamera(800, 450);
+
     public ExampleEditorLevel() {
         world.setGravity(0, -900);
         tilesetMap.put(0, new TextureRegion(new Texture(Gdx.files.internal(LevelEditor.EDITOR_ASSETS_FOLDER + "/fallbacktileset.png"))).split(16, 16)[0]);
@@ -59,6 +61,7 @@ public class ExampleEditorLevel implements EditorHook {
     @Override
     public void update(float delta) {
         world.step(delta);
+        gameCamera.update();
     }
 
     @Override
@@ -71,6 +74,11 @@ public class ExampleEditorLevel implements EditorHook {
             object.render(batch);
         }
         batch.end();
+    }
+
+    @Override
+    public OrthographicCamera getCamera() {
+        return gameCamera;
     }
 
     private void drawBackground(final OrthographicCamera cam) {
